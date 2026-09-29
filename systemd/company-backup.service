@@ -1,0 +1,7 @@
+[Unit]
+Description=Company File Server Backup
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=company/backup/backup.sh

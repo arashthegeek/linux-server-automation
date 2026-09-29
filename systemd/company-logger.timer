@@ -1,0 +1,10 @@
+[Unit]
+Description=Run logger every 30 minutes
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=30min
+Persistant=true
+
+[Install]
+WantedBy=timers.target

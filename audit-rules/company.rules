@@ -1,0 +1,5 @@
+-w /home/admin/Workspace/company/Developers/ -p wa -k company_developers
+-w /home/admin/Workspace/company/HR/ -p wa -k company_hr
+-w /home/admin/Workspace/company/Finance/ -p wa -k company_finance
+-w /home/admin/Workspace/company/Public/ -p wa -k company_public
+-w /home/admin/Workspace/company/Backup/ -p wa -k company_backup

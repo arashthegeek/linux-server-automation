@@ -1,0 +1,7 @@
+[Unit]
+Description=logger
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 company/logger/logger.py
+User=root
