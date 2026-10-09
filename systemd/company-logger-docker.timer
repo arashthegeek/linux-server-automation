@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Dockerized Company Logger periodically
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+Persistent=true
+Unit=company-logger-docker.service
+
+[Install]
+WantedBy=timers.target

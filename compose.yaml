@@ -1,0 +1,46 @@
+services:
+  company-logger:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: linux-server-automation/company-logger:local
+    init: true
+    # This is a batch collector: it exits after one collection pass.
+    restart: "no"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    volumes:
+      # Existing logger paths are hard-coded under this project directory.
+      - type: bind
+        source: ./company
+        target: /home/admin/Workspace/company
+      # Read host-generated system and audit logs; Docker does not run sshd/auditd.
+      - type: bind
+        source: /var/log/journal
+        target: /var/log/journal
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /run/log/journal
+        target: /run/log/journal
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /etc/machine-id
+        target: /etc/machine-id
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: /var/log/audit/audit.log
+        target: /var/log/audit/audit.log
+        read_only: true
+        bind:
+          create_host_path: false
+    tmpfs:
+      - /tmp
