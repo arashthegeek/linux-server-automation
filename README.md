@@ -39,7 +39,13 @@
 │   ├── company-backup.service
 │   ├── company-backup.timer
 │   ├── company-logger.service
-│   └── company-logger.timer
+│   ├── company-logger.timer
+│   ├── company-logger-docker.service
+│   └── company-logger-docker.timer
+├── Dockerfile                # ایمیج Company Logger
+├── compose.yaml              # سرویس Docker Compose
+├── .dockerignore             # فایل‌های مستثنا از build context
+├── DOCKER.md                 # راهنمای کامل Docker
 └── screenshots/              # تصاویر و مستندات بصری سیستم
 ```
 
@@ -113,6 +119,54 @@ sudo systemctl list-timers | grep company
 # بررسی لاگ سرویس لاگر
 sudo systemctl status company-logger.service
 ```
+
+---
+
+## 🐳 اجرای Company Logger با Docker
+
+پروژه امکان اجرای لاگر در یک کانتینر را نیز دارد. در این معماری، **SSH، journald و auditd روی میزبان باقی می‌مانند**؛ کانتینر فقط لاگ‌های میزبان را می‌خواند، رویدادها را پردازش می‌کند و خروجی‌ها و checkpointها را در پوشه پروژه نگه می‌دارد.
+
+### پیش‌نیازها
+
+- Docker Engine و افزونه Docker Compose
+- فعال بودن لاگ‌های SSH در journald و پیکربندی auditd روی میزبان
+- وجود مسیرهای میزبان `/var/log/journal`، `/run/log/journal`، `/etc/machine-id` و `/var/log/audit/audit.log`
+- اجرا از ریشه مخزن
+
+### ساخت و اجرای دستی
+
+```bash
+mkdir -p company/Logs
+docker compose config
+docker compose build
+docker compose run --rm company-logger
+```
+
+مشاهده خروجی‌ها:
+
+```bash
+ls -l company/Logs
+tail -n 50 company/Logs/auth.log
+tail -n 50 company/Logs/error.log
+```
+
+### زمان‌بندی با systemd میزبان (اختیاری)
+
+فایل سرویس Docker پیش‌فرض فرض می‌کند مخزن در مسیر
+`/home/admin/Workspace/linux-server-automation` قرار دارد. اگر مسیر شما متفاوت است، ابتدا `WorkingDirectory` و `ConditionPathExists` را در
+`systemd/company-logger-docker.service` اصلاح کنید.
+
+```bash
+sudo cp systemd/company-logger-docker.service /etc/systemd/system/
+sudo cp systemd/company-logger-docker.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now company-logger-docker.timer
+systemctl list-timers company-logger-docker.timer
+```
+
+**هشدار:** تایمر Docker را هم‌زمان با `company-logger.timer` قدیمی فعال نکن؛ اجرای هم‌زمان دو collector می‌تواند باعث تداخل در فایل‌های checkpoint و cursor شود. قبل از فعال‌کردن زمان‌بندی، یک اجرای دستی را بررسی کن.
+
+راهنمای کامل تنظیمات، محدودیت‌های مانیتورینگ و دسترسی‌های لاگ در [DOCKER.md](DOCKER.md) آمده است.
 
 ---
 
