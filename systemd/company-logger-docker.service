@@ -1,0 +1,10 @@
+[Unit]
+Description=Company Logger (Docker Compose)
+Requires=docker.service
+After=docker.service
+ConditionPathExists=/home/admin/Workspace/linux-server-automation/compose.yaml
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/admin/Workspace/linux-server-automation
+ExecStart=/usr/bin/docker compose run --rm --build company-logger
